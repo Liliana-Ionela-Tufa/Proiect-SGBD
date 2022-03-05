@@ -1,0 +1,769 @@
+--ex 4
+CREATE TABLE JOB(
+id_job NUMBER(5) PRIMARY KEY NOT NULL,
+nume_job VARCHAR(25) NOT NULL,
+salariu_minim NUMBER(6) NOT NULL,
+salariu_maxim NUMBER(6) NOT NULL
+);
+
+CREATE TABLE TIP_SALON (
+id_tip NUMBER(1) PRIMARY KEY NOT NULL,
+nr_paturi NUMBER(2) NOT NULL
+);
+
+CREATE TABLE ADRESA (
+id_adresa NUMBER(5) PRIMARY KEY NOT NULL,
+judet VARCHAR(25) NOT NULL,
+oras VARCHAR(25) NOT NULL,
+strada VARCHAR(25) NOT NULL,
+bloc_nr NUMBER(3) NOT NULL
+);
+
+CREATE TABLE DEPARTAMENT (
+id_departament NUMBER(5) PRIMARY KEY NOT NULL,
+nume_departament  VARCHAR(50) NOT NULL,
+numar_angajati_departament NUMBER(3)
+);
+
+CREATE TABLE ANGAJAT (
+id_angajat NUMBER(5) PRIMARY KEY NOT NULL,
+id_job NUMBER(5) REFERENCES JOB(id_job) ON DELETE SET NULL,
+id_departament NUMBER(5) REFERENCES DEPARTAMENT(id_departament) ON DELETE SET NULL,
+id_adresa NUMBER(5) REFERENCES ADRESA(id_adresa) ON DELETE SET NULL,
+nume VARCHAR(25) NOT NULL,
+prenume VARCHAR(25) NOT NULL,
+data_angajarii DATE NOT NULL,
+telefon VARCHAR(10) NOT NULL,
+salariu NUMBER(6) NOT NULL
+);
+
+CREATE TABLE SALON(
+id_salon NUMBER(3) PRIMARY KEY NOT NULL,
+id_tip NUMBER(1) REFERENCES TIP_SALON(id_tip) ON DELETE SET NULL,
+sectie VARCHAR(50) NOT NULL,
+etaj NUMBER(2) NOT NULL
+);
+
+CREATE TABLE PROGRAM(
+id_angajat NUMBER(5) REFERENCES ANGAJAT(id_angajat) ON DELETE SET NULL,
+nr_zile_lucratoare NUMBER(3) NOT NULL,
+inceput_concediu DATE NOT NULL,
+final_concediu DATE NOT NULL
+);
+
+CREATE TABLE PACIENT (
+id_pacient NUMBER(5)PRIMARY KEY NOT NULL,
+id_salon  NUMBER(3) REFERENCES SALON(id_salon),
+id_adresa NUMBER(5) REFERENCES ADRESA(id_adresa) ON DELETE SET NULL,
+nume VARCHAR(25) NOT NULL,
+prenume VARCHAR(25) NOT NULL,
+data_nasterii DATE NOT NULL,
+telefon VARCHAR(10) NOT NULL
+);
+
+CREATE TABLE DETALII_INTERVENTIE(
+id_detalii_interventie NUMBER(5) PRIMARY KEY NOT NULL,
+data_interventie DATE NOT NULL,
+distanta NUMBER(2) NOT NULL,
+cauza_interventie VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE OPERATIE(
+id_operatie  NUMBER(5) PRIMARY KEY NOT NULL,
+nume_operatie VARCHAR(50) NOT NULL,
+perioada_recuperare NUMBER(3) NOT NULL,
+id_pacient NUMBER(5) REFERENCES PACIENT(id_pacient) ON DELETE SET NULL
+);
+
+CREATE TABLE ISTORIC_PACIENT(
+id_pacient NUMBER(5) REFERENCES PACIENT(id_pacient) NOT NULL,
+data_interventie DATE NOT NULL,
+CONSTRAINT PK_ISTORIC_PACIENT PRIMARY KEY(id_pacient, data_interventie),
+nume_interventie VARCHAR(50) NOT NULL,
+problema_medicala VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE AMBULANTA(
+id_pacient NUMBER(5) REFERENCES PACIENT(id_pacient) NOT NULL,
+id_ambulanta VARCHAR(10) NOT NULL,
+CONSTRAINT PK_AMBULANTA PRIMARY KEY(id_pacient, id_ambulanta),
+id_angajat NUMBER(5) REFERENCES ANGAJAT(id_angajat) NOT NULL,
+id_detalii_interventie NUMBER(5) REFERENCES DETALII_INTERVENTIE(id_detalii_interventie)
+);
+
+CREATE TABLE CONSULTA(
+id_pacient NUMBER(5) REFERENCES PACIENT(id_pacient) NOT NULL,
+id_angajat NUMBER(5) REFERENCES ANGAJAT(id_angajat) NOT NULL,
+data_consultatie DATE NOT NULL,
+diagnostic VARCHAR(50),
+CONSTRAINT PK_CONSULTA PRIMARY KEY (id_pacient, id_angajat)
+);
+
+CREATE TABLE REALIZEAZA(
+id_angajat NUMBER(5) REFERENCES ANGAJAT(id_angajat) NOT NULL,
+id_operatie NUMBER(5) REFERENCES OPERATIE(id_operatie) NOT NULL,
+data_operatie DATE NOT NULL,
+CONSTRAINT PK_REALIZEZA PRIMARY KEY (id_operatie, id_angajat)
+);
+
+
+--ex 5
+INSERT INTO ADRESA (id_adresa, judet, oras, strada, bloc_nr)
+VALUES(14711, 'Teleorman', 'Rosiorii de Vede', 'Aleaa CFR', '5');
+
+INSERT INTO ADRESA (id_adresa, judet, oras, strada, bloc_nr)
+VALUES(12323, 'Ilfov', 'Bucuresti', 'Serban Voda', '102');
+
+INSERT INTO ADRESA (id_adresa, judet, oras, strada, bloc_nr)
+VALUES (1041, 'Ilfov', 'Chiajna', 'Tineretului', 31);
+
+INSERT INTO ADRESA (id_adresa, judet, oras, strada, bloc_nr)
+VALUES (2121, 'Teleorman', 'Videle', 'Republicii', 23);
+
+INSERT INTO ADRESA (id_adresa, judet, oras, strada, bloc_nr)
+VALUES (14119, 'Suceava', 'Suceava', 'Libertatii', 14);
+
+INSERT INTO ADRESA (id_adresa, judet, oras, strada, bloc_nr)
+VALUES(564, 'Giurgiu', 'Magura', 'Tineretului', 12);
+
+INSERT INTO ADRESA (id_adresa, judet, oras, strada, bloc_nr)
+VALUES(23, 'Dambovita', 'Merisor', 'Salcamului', 250);
+
+INSERT INTO ADRESA (id_adresa, judet, oras, strada, bloc_nr)
+VALUES(67, 'Ilfov', 'Bucuresti', 'Ateneului', 20);
+
+INSERT INTO ADRESA (id_adresa, judet, oras, strada, bloc_nr)
+VALUES(78, 'Ilfov', 'Bucuresti', 'Cupolei', 23);
+
+INSERT INTO TIP_SALON (id_tip, nr_paturi)
+VALUES (1, 1);
+
+INSERT INTO TIP_SALON (id_tip, nr_paturi)
+VALUES(2, 2);
+
+INSERT INTO TIP_SALON (id_tip, nr_paturi)
+VALUES(3, 5);
+
+INSERT INTO TIP_SALON (id_tip, nr_paturi)
+VALUES(4, 8);
+
+INSERT INTO TIP_SALON (id_tip, nr_paturi)
+VALUES(5, 10);
+
+INSERT INTO JOB (id_job, nume_job, salariu_minim, salariu_maxim)
+VALUES(5, 'Doctor', 10000, 150000);
+
+INSERT INTO JOB (id_job, nume_job, salariu_minim, salariu_maxim)
+Values(3, 'Asistent', 2500, 5500);
+
+INSERT INTO JOB (id_job, nume_job, salariu_minim, salariu_maxim)
+VALUES(1, 'Personal curatenie', 1400, 2200);
+
+INSERT INTO JOB (id_job, nume_job, salariu_minim, salariu_maxim)
+VALUES(10, 'Sofer ambulanta', 1900, 3000);
+
+INSERT INTO JOB (id_job, nume_job, salariu_minim, salariu_maxim)
+VALUES(11, 'Infirmier', 1900, 3000);
+
+INSERT INTO JOB (id_job, nume_job, salariu_minim, salariu_maxim)
+VALUES(14, 'Paznic', 1400, 2200);
+
+INSERT INTO DEPARTAMENT (id_departament, nume_departament, numar_angajati_departament)
+VALUES(1, 'Pediatrie', 3);
+
+INSERT INTO DEPARTAMENT (id_departament, nume_departament, numar_angajati_departament)
+VALUES(2, 'Cardiologie', 2);
+
+INSERT INTO DEPARTAMENT (id_departament, nume_departament, numar_angajati_departament)
+VALUES(3, 'Neurologie', 2);
+
+INSERT INTO DEPARTAMENT (id_departament, nume_departament, numar_angajati_departament)
+VALUES(4, 'Chirurgie plastica', 1);
+
+INSERT INTO DEPARTAMENT (id_departament, nume_departament, numar_angajati_departament)
+VALUES(5, 'General', 3);
+
+INSERT INTO ANGAJAT (id_angajat, id_job, id_departament, id_adresa, nume, prenume, data_angajarii, telefon, salariu)
+VALUES(3, 5, 1, 14711, 'Olteanu', 'Ana', TO_DATE ('2015/10/16', 'YYYY/MM//DD'), '0756482944', 15000);
+
+INSERT INTO ANGAJAT (id_angajat, id_job, id_departament, id_adresa, nume, prenume, data_angajarii, telefon, salariu)
+VALUES(5, 5, 1, 14711, 'Olteanu', 'Alexandru', TO_DATE('2015/03/21', 'YYYY/MM/DD'), '076351623', 15000);
+
+INSERT INTO ANGAJAT (id_angajat, id_job, id_departament, id_adresa, nume, prenume, data_angajarii, telefon, salariu)
+VALUES(7, 5, 1, 12323, 'Toader', 'Catalin', TO_DATE('2000/11/23', 'YYYY/MM/DD'), '0762536284', 45000);
+
+INSERT INTO ANGAJAT (id_angajat, id_job, id_departament, id_adresa, nume, prenume, data_angajarii, telefon, salariu)
+VALUES(2, 5, 2, 2121, 'Popovici', 'Ioan', TO_DATE('2003/03/11', 'YYYY/MM/DD'), '0763456782', 40000);
+
+INSERT INTO ANGAJAT (id_angajat, id_job, id_departament, id_adresa, nume, prenume, data_angajarii, telefon, salariu)
+VALUES(4, 3, 2, 1041, 'Delcescu', 'Mihai', TO_DATE('2010/05/11', 'YYYY/MM/DD'), '0789035627', 4000);
+
+INSERT INTO ANGAJAT (id_angajat, id_job, id_departament, id_adresa, nume, prenume, data_angajarii, telefon, salariu)
+VALUES(10, 5, 3, 14119, 'Untesu', 'Stefan', TO_DATE('2005/01/14', 'YYYY/MM/DD'), '0762943123', 150000);
+
+INSERT INTO ANGAJAT (id_angajat, id_job, id_departament, id_adresa, nume, prenume, data_angajarii, telefon, salariu)
+VALUES(20, 10, NULL, 1041, 'Popescu', 'Ion', TO_DATE('2014/11/25', 'YYYY/MM/DD'), '0783647282', 2500);
+
+INSERT INTO ANGAJAT (id_angajat, id_job, id_departament, id_adresa, nume, prenume, data_angajarii, telefon, salariu)
+VALUES(21, 10, NULL, 1041, 'Popescu', 'Mircea', TO_DATE('2017/11/25', 'YYYY/MM/DD'), '0783657282', 2200);
+
+INSERT INTO ANGAJAT (id_angajat, id_job, id_departament, id_adresa, nume, prenume, data_angajarii, telefon, salariu)
+VALUES(30, 14, NULL, 78, 'Boicea', 'Serban', TO_DATE('2019/11/9', 'YYYY/MM/DD'), '0784289423', 2000);
+
+INSERT INTO ANGAJAT (id_angajat, id_job, id_departament, id_adresa, nume, prenume, data_angajarii, telefon, salariu)
+VALUES(31, 14, NULL, 67, 'Dolveac', 'Alin', TO_DATE('2000/11/23', 'YYYY/MM/DD'), '078923342', 2200);
+
+INSERT INTO ANGAJAT (id_angajat, id_job, id_departament, id_adresa, nume, prenume, data_angajarii, telefon, salariu)
+VALUES(41, 1, NULL, 23, 'Celeapca', 'Angi', TO_DATE('2009/10/18', 'YYYY/MM/DD'), '0723456789', 2200);
+
+INSERT INTO ANGAJAT (id_angajat, id_job, id_departament, id_adresa, nume, prenume, data_angajarii, telefon, salariu)
+VALUES(51, 11, NULL, 564, 'Ionete', 'Alexandra', TO_DATE('2020/03/21', 'YYYY/MM/DD'), '0765361792', 1900);
+
+INSERT INTO ANGAJAT (id_angajat, id_job, id_departament, id_adresa, nume, prenume, data_angajarii, telefon, salariu)
+VALUES(61, 11, 5, 14119, 'Darie', 'Dana', TO_DATE('2000/03/21', 'YYYY/MM/DD'), '0764561792', 50000);
+
+INSERT INTO ANGAJAT (id_angajat, id_job, id_departament, id_adresa, nume, prenume, data_angajarii, telefon, salariu)
+VALUES(100, 5, 4, 564, 'Nedelcu', 'Roxana', TO_DATE('2001/03/21', 'YYYY/MM/DD'), '0723561792', 51000);
+
+INSERT INTO PROGRAM (id_angajat, nr_zile_lucratoare, inceput_concediu, final_concediu)
+VALUES(3, 262, TO_DATE('2021/07/20', 'YYYY/MM/DD'),  TO_DATE('2021/08/04', 'YYYY/MM/DD')); 
+
+INSERT INTO PROGRAM (id_angajat, nr_zile_lucratoare, inceput_concediu, final_concediu)
+VALUES(5, 262, TO_DATE('2021/07/20', 'YYYY/MM/DD'),  TO_DATE('2021/08/04', 'YYYY/MM/DD')); 
+
+INSERT INTO PROGRAM (id_angajat, nr_zile_lucratoare, inceput_concediu, final_concediu)
+VALUES(7, 262, TO_DATE('2021/08/20', 'YYYY/MM/DD'),  TO_DATE('2021/09/04', 'YYYY/MM/DD')); 
+
+INSERT INTO PROGRAM (id_angajat, nr_zile_lucratoare, inceput_concediu, final_concediu)
+VALUES(4, 270, TO_DATE('2021/07/10', 'YYYY/MM/DD'),  TO_DATE('2021/07/24', 'YYYY/MM/DD')); 
+
+INSERT INTO PROGRAM (id_angajat, nr_zile_lucratoare, inceput_concediu, final_concediu)
+VALUES(2, 260, TO_DATE('2021/08/30', 'YYYY/MM/DD'),  TO_DATE('2021/09/14', 'YYYY/MM/DD')); 
+
+INSERT INTO PROGRAM (id_angajat, nr_zile_lucratoare, inceput_concediu, final_concediu)
+VALUES(10, 250, TO_DATE('2021/07/20', 'YYYY/MM/DD'),  TO_DATE('2021/08/14', 'YYYY/MM/DD')); 
+
+INSERT INTO PROGRAM (id_angajat, nr_zile_lucratoare, inceput_concediu, final_concediu)
+VALUES(20, 270, TO_DATE('2021/09/20', 'YYYY/MM/DD'),  TO_DATE('2021/10/04', 'YYYY/MM/DD')); 
+
+INSERT INTO PROGRAM (id_angajat, nr_zile_lucratoare, inceput_concediu, final_concediu)
+VALUES(21, 275, TO_DATE('2021/07/20', 'YYYY/MM/DD'),  TO_DATE('2021/08/04', 'YYYY/MM/DD')); 
+
+INSERT INTO PROGRAM (id_angajat, nr_zile_lucratoare, inceput_concediu, final_concediu)
+VALUES(31, 280, TO_DATE('2021/06/25', 'YYYY/MM/DD'),  TO_DATE('2021/07/10', 'YYYY/MM/DD')); 
+
+INSERT INTO PROGRAM (id_angajat, nr_zile_lucratoare, inceput_concediu, final_concediu)
+VALUES(41, 285, TO_DATE('2021/06/20', 'YYYY/MM/DD'),  TO_DATE('2021/07/08', 'YYYY/MM/DD')); 
+
+INSERT INTO PROGRAM (id_angajat, nr_zile_lucratoare, inceput_concediu, final_concediu)
+VALUES(51, 285, TO_DATE('2021/04/15', 'YYYY/MM/DD'),  TO_DATE('2021/05/01', 'YYYY/MM/DD')); 
+
+INSERT INTO SALON (id_salon, id_tip, sectie, etaj)
+VALUES(10, 1, 'A', 1);
+
+INSERT INTO SALON (id_salon, id_tip, sectie, etaj)
+VALUES(34, 3, 'B', 3);
+
+INSERT INTO SALON (id_salon, id_tip, sectie, etaj)
+VALUES(38, 3, 'B', 3);
+
+INSERT INTO SALON (id_salon, id_tip, sectie, etaj)
+VALUES(59, 4, 'D', 5);
+
+INSERT INTO SALON (id_salon, id_tip, sectie, etaj)
+VALUES(22, 5, 'AB', 2);
+
+INSERT INTO PACIENT (id_pacient, id_salon, id_adresa, nume, prenume, data_nasterii, telefon)
+VALUES(10, 10, 78, 'Alecu', 'Andrei', TO_DATE('2000/01/01', 'YYYY/MM/DD'), '0765738271');
+
+INSERT INTO PACIENT (id_pacient, id_salon, id_adresa, nume, prenume, data_nasterii, telefon)
+VALUES(11, NULL, 14711, 'Manica', 'Andreea', TO_DATE('1997/03/01', 'YYYY/MM/DD'), '0765738341');
+
+INSERT INTO PACIENT (id_pacient, id_salon, id_adresa, nume, prenume, data_nasterii, telefon)
+VALUES(12, 34, 564, 'Popescu', 'Andrei', TO_DATE('1985/01/01', 'YYYY/MM/DD'), '0734738271');
+
+INSERT INTO PACIENT (id_pacient, id_salon, id_adresa, nume, prenume, data_nasterii, telefon)
+VALUES(13, 22, 67, 'Ivanescu', 'David', TO_DATE('1979/12/25', 'YYYY/MM/DD'), '0769868271');
+
+INSERT INTO PACIENT (id_pacient, id_salon, id_adresa, nume, prenume, data_nasterii, telefon)
+VALUES(14, 59, 2121, 'Preda', 'Luciana', TO_DATE('1975/05/11', 'YYYY/MM/DD'), '0765778171');
+
+INSERT INTO PACIENT (id_pacient, id_salon, id_adresa, nume, prenume, data_nasterii, telefon)
+VALUES(15, 59, 12323, 'Apostol', 'Ana', TO_DATE('2000/05/11', 'YYYY/MM/DD'), '0723778171');
+
+INSERT INTO PACIENT (id_pacient, id_salon, id_adresa, nume, prenume, data_nasterii, telefon)
+VALUES(16, 22, 14711, 'Bobes', 'Mihai', TO_DATE('1990/06/21', 'YYYY/MM/DD'), '0765790171');
+
+INSERT INTO DETALII_INTERVENTIE (id_detalii_interventie, data_interventie, distanta, cauza_interventie)
+VALUES(100, TO_DATE('2021/06/01', 'YYYY/MM/DD'), 45, 'atac cerebral');
+
+INSERT INTO DETALII_INTERVENTIE (id_detalii_interventie, data_interventie, distanta, cauza_interventie)
+VALUES(101, TO_DATE('2021/06/02', 'YYYY/MM/DD'), 5, 'arsuri');
+
+INSERT INTO DETALII_INTERVENTIE (id_detalii_interventie, data_interventie, distanta, cauza_interventie)
+VALUES(102, TO_DATE('2021/06/01', 'YYYY/MM/DD'), 10, 'picior rupt');
+
+INSERT INTO DETALII_INTERVENTIE (id_detalii_interventie, data_interventie, distanta, cauza_interventie)
+VALUES(103, TO_DATE('2021/06/03', 'YYYY/MM/DD'), 40, 'atac vascular');
+
+INSERT INTO DETALII_INTERVENTIE (id_detalii_interventie, data_interventie, distanta, cauza_interventie)
+VALUES(104, TO_DATE('2021/06/04', 'YYYY/MM/DD'), 12, 'febra');
+
+INSERT INTO AMBULANTA (id_pacient, id_ambulanta, id_angajat, id_detalii_interventie)
+VALUES(16, 'B23AMB', 20, 100);
+
+INSERT INTO AMBULANTA (id_pacient, id_ambulanta, id_angajat, id_detalii_interventie)
+VALUES(11, 'B24AMB', 51, 101);
+
+INSERT INTO AMBULANTA (id_pacient, id_ambulanta, id_angajat, id_detalii_interventie)
+VALUES(12, 'B23AMB', 61, 102);
+
+INSERT INTO AMBULANTA (id_pacient, id_ambulanta, id_angajat, id_detalii_interventie)
+VALUES(13, 'B25AMB', 51, 103);
+
+INSERT INTO AMBULANTA (id_pacient, id_ambulanta, id_angajat, id_detalii_interventie)
+VALUES(15, 'B26AMB', 4, 104);
+
+INSERT INTO OPERATIE(id_operatie, nume_operatie, perioada_recuperare, id_pacient)
+VALUES(1, 'reconstructie nazala', 15, 11); 
+
+INSERT INTO OPERATIE(id_operatie, nume_operatie, perioada_recuperare, id_pacient)
+VALUES(2, 'reconstructie nazala', 15, 15); 
+
+INSERT INTO OPERATIE(id_operatie, nume_operatie, perioada_recuperare, id_pacient)
+VALUES(3, 'apendicita', 10, 10); 
+
+INSERT INTO OPERATIE(id_operatie, nume_operatie, perioada_recuperare, id_pacient)
+VALUES(4, 'transplat de plamani', 100, 13); 
+
+INSERT INTO OPERATIE(id_operatie, nume_operatie, perioada_recuperare, id_pacient)
+VALUES(5, 'pietre la rinichi', 20, 16); 
+
+INSERT INTO REALIZEAZA(id_angajat, id_operatie, data_operatie)
+VALUES(100, 1, to_date('2019/11/21 08:30:00', 'YYYY/MM/DD HH:MI:SS'));
+
+INSERT INTO REALIZEAZA(id_angajat, id_operatie, data_operatie)
+VALUES(61, 1, TO_DATE('2019/11/21', 'YYYY/MM/DD'));
+
+INSERT INTO REALIZEAZA(id_angajat, id_operatie, data_operatie)
+VALUES(51, 1, TO_DATE('2019/11/21', 'YYYY/MM/DD'));
+
+INSERT INTO REALIZEAZA(id_angajat, id_operatie, data_operatie)
+VALUES(100, 2, TO_DATE('2019/12/23', 'YYYY/MM/DD'));
+
+INSERT INTO REALIZEAZA(id_angajat, id_operatie, data_operatie)
+VALUES(51, 2, TO_DATE('2019/12/24', 'YYYY/MM/DD'));
+
+INSERT INTO REALIZEAZA(id_angajat, id_operatie, data_operatie)
+VALUES(61, 3, TO_DATE('2020/11/25', 'YYYY/MM/DD'));
+
+INSERT INTO REALIZEAZA(id_angajat, id_operatie, data_operatie)
+VALUES(4, 3, TO_DATE('2020/01/13', 'YYYY/MM/DD'));
+
+INSERT INTO REALIZEAZA(id_angajat, id_operatie, data_operatie)
+VALUES(100, 4, TO_DATE('2021/10/25', 'YYYY/MM/DD'));
+
+INSERT INTO REALIZEAZA(id_angajat, id_operatie, data_operatie)
+VALUES(61, 4, TO_DATE('2020/01/06', 'YYYY/MM/DD'));
+
+INSERT INTO REALIZEAZA(id_angajat, id_operatie, data_operatie)
+VALUES(2, 5, TO_DATE('2019/01/14', 'YYYY/MM/DD'));
+
+insert into  CONSULTA (id_angajat, id_pacient, data_consultatie, diagnostic)
+values (2, 10, TO_DATE('2020/01/06', 'YYYY/MM/DD'), 'bronsita');
+
+insert into  CONSULTA (id_angajat, id_pacient, data_consultatie, diagnostic)
+values (2, 11, TO_DATE('2020/01/06', 'YYYY/MM/DD'), 'gripa');
+
+insert into  CONSULTA (id_angajat, id_pacient, data_consultatie, diagnostic)
+values (2, 12, TO_DATE('2020/01/10', 'YYYY/MM/DD'), 'probleme cardiace');
+
+insert into  CONSULTA (id_angajat, id_pacient, data_consultatie, diagnostic)
+values (10, 15, TO_DATE('2020/01/20', 'YYYY/MM/DD'), 'atac cerebral');
+
+insert into  CONSULTA (id_angajat, id_pacient, data_consultatie, diagnostic)
+values (100, 15, TO_DATE('2020/01/20', 'YYYY/MM/DD'), 'atac cerebral');
+
+insert into  CONSULTA (id_angajat, id_pacient, data_consultatie, diagnostic)
+values (10, 14, TO_DATE('2020/02/06', 'YYYY/MM/DD'), 'probleme vasculare');
+
+insert into  CONSULTA (id_angajat, id_pacient, data_consultatie, diagnostic)
+values (100, 16, TO_DATE('2019/06/06', 'YYYY/MM/DD'), 'pietre la rinichi');
+
+insert into  CONSULTA (id_angajat, id_pacient, data_consultatie, diagnostic)
+values (100, 10, TO_DATE('2015/01/06', 'YYYY/MM/DD'), 'lipsa de fier');
+
+insert into  CONSULTA (id_angajat, id_pacient, data_consultatie, diagnostic)
+values (61, 14, TO_DATE('2020/01/06', 'YYYY/MM/DD'), 'otita');
+
+insert into  CONSULTA (id_angajat, id_pacient, data_consultatie, diagnostic)
+values (61, 13, TO_DATE('2000/11/13', 'YYYY/MM/DD'), 'scleroza multipla');
+
+insert into ISTORIC_PACIENT (id_pacient, data_interventie, nume_interventie, problema_medicala)
+values (10,  TO_DATE('2019/04/06', 'YYYY/MM/DD'), 'consultatie', 'otita');
+
+insert into ISTORIC_PACIENT (id_pacient, data_interventie, nume_interventie, problema_medicala)
+values (10,  TO_DATE('2020/11/06', 'YYYY/MM/DD'), 'consultatie', 'bronsita');
+
+insert into ISTORIC_PACIENT (id_pacient, data_interventie, nume_interventie, problema_medicala)
+values (12,  TO_DATE('2018/09/11', 'YYYY/MM/DD'), 'operatie', 'extractie polipi');
+
+insert into ISTORIC_PACIENT (id_pacient, data_interventie, nume_interventie, problema_medicala)
+values (15,  TO_DATE('2016/04/06', 'YYYY/MM/DD'), 'operatie', 'extractie amigdalita');
+
+insert into ISTORIC_PACIENT (id_pacient, data_interventie, nume_interventie, problema_medicala)
+values (16,  TO_DATE('2019/04/06', 'YYYY/MM/DD'), 'consultatie', 'gripa');
+
+--ex 6
+--Afisati departamentele cu id impar, ce au mai multi angajati decat un numar nr dat ca parametru.
+create or replace procedure ex6(nr number)
+    is
+    type tabel_indexat is table of varchar2(50) index by pls_integer;
+    type vector is array(3) of number;
+    v vector := vector();
+    t tabel_indexat;
+    j number;
+    
+begin
+    j := 0;
+    for i in 1..5 loop
+        if i mod 2 = 1 then
+            j := j + 1;
+            v.extend;
+            v(j) := i;
+        end if;
+    end loop;
+    
+    for i in v.first..v.last loop
+        select nume_departament into t(i)
+        from departament
+        where id_departament = v(i) and numar_angajati_departament >= nr;
+    end loop;
+
+    for i in t.first..t.last loop
+        dbms_output.put_line(t(i));
+    end loop;
+    
+    exception 
+        when no_data_found then
+            raise_application_error(-20000, 'Nu exista departamente');
+    
+end;
+/
+begin
+    ex6(2);
+end;
+
+begin
+    ex6(4);
+end;
+
+--ex 7
+--Afisati pentru fiecare job numele si prenumele persoanelor angajate dupa un an nr dat ca parametru.
+create or replace procedure ex7(nr number)
+is  
+    nr_val number :=0;
+    exceptie exception;
+    begin
+        for i in (select id_job, nume_job from job) loop
+            for j in (select id_job, nume, prenume, data_angajarii from angajat) loop
+                if i.id_job = j.id_job then
+                    if extract(year from j.data_angajarii) >= nr then
+                        nr_val := nr_val + 1;
+                        dbms_output.put_line(i.nume_job || ': ' || j.nume || ' ' || j.prenume);
+                    end if;
+                end if;
+            end loop;
+        dbms_output.new_line;
+        end loop;
+        if nr_val = 0 then
+            raise exceptie;
+        end if;
+        exception
+            when exceptie then
+                raise_application_error(-20000, 'Nu exista personal angajat dupa acest an');
+
+end ex7;
+/
+
+begin
+    ex7(2017);
+end;
+
+begin
+    ex7(2021);
+end;
+/
+
+--ex8
+--Determinati numarul de pacienti ce s-au internat in urma unei operatii, numele operatiei fiind dat ca parametru
+create or replace function ex8
+    (nume_op operatie.nume_operatie%type)
+    return number is
+    nr number := 0;
+    exceptie exception;
+begin
+    select count(s.id_salon)
+    into nr
+    from operatie o, pacient p, salon s
+    where lower(o.nume_operatie) = lower(nume_op) and o.id_pacient = p.id_pacient and p.id_salon= s.id_salon;
+        
+    if nr = 0 then
+        raise exceptie;
+    end if;
+    
+    return nr;
+
+    exception 
+        when exceptie then
+            raise_application_error(-20000, 'Nu s-au internat pacienti');
+        when others then
+            raise_application_error(-20002, 'Alta eroare');
+end ex8;
+
+
+begin
+    dbms_output.put_line(ex8('transplant de plamani'));
+end;
+/
+
+begin
+    dbms_output.put_line(ex8('reconstructie nazala'));
+end;
+/
+
+--ex 9
+--Aratati ce probleme medicale au mai avut pacientii (din tabela istoric_pacient) care au fost operati de un anumit doctor, numele acestuia fiind dat ca parametru
+create or replace procedure ex9
+    (nume_ang angajat.nume%type)
+    is
+    type tabel_indexat is table of varchar2(50) index by pls_integer;
+    informatii tabel_indexat;
+    id_ang angajat.id_angajat%type;
+    
+begin
+    select id_angajat into id_ang
+    from angajat 
+    where lower(nume) = lower(nume_ang);
+    
+    select i.problema_medicala
+    bulk collect into informatii
+    from    angajat a, realizeaza r, operatie o, pacient p, istoric_pacient i
+    where id_ang = a.id_angajat and a.id_angajat= r.id_angajat and r.id_operatie=o.id_operatie
+        and o.id_pacient = p.id_pacient and p.id_pacient = i.id_pacient;
+    
+    dbms_output.put_line('Informatii despre pacientii operati de dr. ' || nume_ang || ': ');
+    
+    for i in informatii.first..informatii.last loop
+        dbms_output.put_line(informatii(i));
+    end loop;
+    EXCEPTION
+         when no_data_found then 
+            raise_application_error(-20000,'Nu exista anagajatul introdus.'); 
+        when too_many_rows then 
+            raise_application_error(-20001,'Exista mai multe informatii ale angajatilor operati de angajatul dat.'); 
+        when others then
+            raise_application_error(-20002, 'Alta erorare!!');
+        
+end ex9;
+/
+
+begin
+    ex9('darie');
+end;
+/
+
+begin
+    ex9('georgescu');
+end;
+/
+
+begin
+    ex9('untesu');
+end;
+/
+
+--ex 10
+--Nu se pot face modificari asupra tabelei job in lunile de iarna ale anului.
+create or replace trigger trigger_1 before
+    update or insert or delete on job
+begin
+    if to_char(sysdate, 'MM') = 1 or to_char(sysdate, 'MM') = 2 or to_char(sysdate, 'MM') = 12 then
+            raise_application_error(-20001, 'Nu puteti efectua modificari in lunile de iarna.');
+    end if;
+end;
+
+insert into job values 
+(15, 'Supraveghetor', 2000, 3000);
+
+--ex 11 
+--Nu puteti modifica data unei consultatii cu o data mai mica decat data curenta.
+create or replace trigger trigger_2 before
+    update of data_consultatie on consulta
+    for each row
+begin
+    if (:new.data_consultatie < sysdate) then
+        raise_application_error(-20002, 'Nu puteti modifica data consultatiei cu o data din trecut.'); 
+    end if;
+end;
+/
+
+update consulta
+set data_consultatie = to_date('2019/01/14', 'YYYY/MM/DD')
+where id_pacient = 10 and id_angajat = 2;
+
+--ex 12
+--Nu puteti sterge tabele din baza de date.
+create or replace trigger trigger_3 before
+    drop on database
+begin
+    raise_application_error(-20002, 'Nu aveti voie sa stergeti din tabele.');
+end;
+/
+
+drop table tip_salon;
+
+--ex 13
+create or replace package pachet as
+    
+    procedure ex6 (nr number);
+    procedure ex7 (nr number);
+    function ex8 (nume_op operatie.nume_operatie%type) return number;
+    procedure ex9 (nume_ang angajat.nume%type);
+    
+end pachet;
+/
+
+create or replace package body pachet as
+
+ procedure ex6(nr number)
+    is
+    type tabel_indexat is table of varchar2(50) index by pls_integer;
+    type vector is array(3) of number;
+    v vector := vector();
+    t tabel_indexat;
+    j number;
+    
+begin
+    j := 0;
+    for i in 1..5 loop
+        if i mod 2 = 1 then
+            j := j + 1;
+            v.extend;
+            v(j) := i;
+        end if;
+    end loop;
+    
+    for i in v.first..v.last loop
+        select nume_departament into t(i)
+        from departament
+        where id_departament = v(i) and numar_angajati_departament >= nr;
+    end loop;
+
+    for i in t.first..t.last loop
+        dbms_output.put_line(t(i));
+    end loop;
+    
+    exception 
+        when no_data_found then
+            raise_application_error(-20000, 'Nu exista departamente');
+end ex6;
+
+procedure ex7(nr number)
+is  
+    nr_val number :=0;
+    exceptie exception;
+    begin
+        for i in (select id_job, nume_job from job) loop
+            for j in (select id_job, nume, prenume, data_angajarii from angajat) loop
+                if i.id_job = j.id_job then
+                    if extract(year from j.data_angajarii) >= nr then
+                        nr_val := nr_val + 1;
+                        dbms_output.put_line(i.nume_job || ': ' || j.nume || ' ' || j.prenume);
+                    end if;
+                end if;
+            end loop;
+        dbms_output.new_line;
+        end loop;
+        if nr_val = 0 then
+            raise exceptie;
+        end if;
+        exception
+            when exceptie then
+                raise_application_error(-20000, 'Nu exista personal angajat dupa acest an');
+end ex7;
+
+function ex8
+    (nume_op operatie.nume_operatie%type)
+    return number is
+    nr number := 0;
+    exceptie exception;
+begin
+    select count(s.id_salon)
+    into nr
+    from operatie o, pacient p, salon s
+    where lower(o.nume_operatie) = lower(nume_op) and o.id_pacient = p.id_pacient and p.id_salon= s.id_salon;
+        
+    if nr = 0 then
+        raise exceptie;
+    end if;
+    
+    return nr;
+
+    exception 
+        when exceptie then
+            raise_application_error(-20000, 'Nu s-au internat pacienti');
+        when others then
+            raise_application_error(-20002, 'Alta eroare');
+end ex8;
+
+ procedure ex9
+    (nume_ang angajat.nume%type)
+    is
+    type tabel_indexat is table of varchar2(50) index by pls_integer;
+    informatii tabel_indexat;
+    id_ang angajat.id_angajat%type;
+    
+begin
+    select id_angajat into id_ang
+    from angajat 
+    where lower(nume) = lower(nume_ang);
+    
+    select i.problema_medicala
+    bulk collect into informatii
+    from    angajat a, realizeaza r, operatie o, pacient p, istoric_pacient i
+    where id_ang = a.id_angajat and a.id_angajat= r.id_angajat and r.id_operatie=o.id_operatie
+        and o.id_pacient = p.id_pacient and p.id_pacient = i.id_pacient;
+    
+    dbms_output.put_line('Informatii despre pacientii operati de dr. ' || nume_ang || ': ');
+    
+    for i in informatii.first..informatii.last loop
+        dbms_output.put_line(informatii(i));
+    end loop;
+    EXCEPTION
+         when no_data_found then 
+            raise_application_error(-20000,'Nu exista anagajatul introdus.'); 
+        when too_many_rows then 
+            raise_application_error(-20001,'Exista mai multe informatii ale angajatilor operati de angajatul dat.'); 
+        when others then
+            raise_application_error(-20002, 'Alta erorare!!');
+        
+end ex9;
+
+end pachet;
+/
+
+begin
+    pachet.ex6(2);
+    dbms_output.new_line;
+    
+    pachet.ex7(2017);
+    dbms_output.new_line;
+    
+    dbms_output.put_line('Numarul pacientilor internati este ' || pachet.ex8('reconstructie nazala'));
+    dbms_output.new_line;
+    
+    pachet.ex9('darie');
+    
+end;
+/
